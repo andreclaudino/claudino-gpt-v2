@@ -2,7 +2,7 @@ import os
 import polars as pl
 import numpy as np
 
-def load_proceprocessing_raw_data(source_path: str, train_test_split_ratio: float, random_seed: int) -> pl.DataFrame:
+def load_proceprocessing_raw_data(source_path: str, random_seed: int, train_test_split_ratio: float=0.0) -> pl.DataFrame:
     pl.set_random_seed(random_seed)
     
     raw_dataframe = pl.read_csv(source_path)
@@ -21,8 +21,8 @@ def save_preprocessing_dataframe(dataframe: pl.DataFrame, output_path: str) -> N
         compression_level: Zstd compression level (0-22)
     """
     # Create train and test directories
-    train_path = os.path.join(output_path, "train.csv")
-    test_path = os.path.join(output_path, "test.csv")
+    train_path = os.path.join(output_path, "train.json")
+    test_path = os.path.join(output_path, "validation.json")
 
     # Ensure directories exist
     os.makedirs(output_path, exist_ok=True)
@@ -72,5 +72,5 @@ def _save_dataframe_partition(dataframe: pl.DataFrame, file_path: str, index: in
     if dataframe.height > 0:
         dataframe\
             .drop("split")\
-            .write_csv(file_path)
+            .write_ndjson(file_path)
         print(f"Dataset {index} saved to {file_path}")
