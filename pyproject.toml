@@ -1,0 +1,14 @@
+[project]
+name = "claudino-gpt-v2"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12.11"
+dependencies = [
+    "tensorflow==2.19.0",
+    "tensorflow-text==2.19.0",
+    "polars==1.25.2",
+    "transformers==4.56.1",
+    "tokenizers==0.22.0",
+    "tf-keras>=2.19.0",
+]
