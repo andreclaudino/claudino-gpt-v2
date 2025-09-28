@@ -14,9 +14,11 @@ class ClaudinoGPT(TFGPT2LMHeadModel):
         self._config = GPT2Config(
             vocab_size=tokenizer.vocab_size,
             bos_token_id=tokenizer.bos_token_id,
-            eos_token_id=tokenizer.eos_token_id
+            eos_token_id=tokenizer.eos_token_id,
+            *args,
+            **kwargs
         )
-        super().__init__(self._config, name=name, *args, **kwargs)
+        super().__init__(self._config, name=name)
 
     
     def call(self, inputs, training=False):
