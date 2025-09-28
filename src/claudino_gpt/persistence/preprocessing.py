@@ -6,6 +6,7 @@ def load_proceprocessing_raw_data(source_path: str, random_seed: int, train_test
     pl.set_random_seed(random_seed)
     
     raw_dataframe = pl.read_csv(source_path)
+    raw_dataframe = raw_dataframe.select("conteudo_noticia").drop_nans().drop_nulls().unique()
     raw_dataframe = _add_split_column(raw_dataframe, train_test_split_ratio)
 
     return raw_dataframe

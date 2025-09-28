@@ -45,10 +45,6 @@ def load_training_data(
         if isinstance(token, int):
             clean_tokens.append(token)
         else:
-            print(
-                f"⚠️ Token inválido na posição {i}: {repr(token)} (tipo: {type(token)}). "
-                f"Substituindo por UNK ('{unk_token}', ID={unk_token_id})."
-            )
             clean_tokens.append(unk_token_id)
 
     if len(clean_tokens) < block_size:

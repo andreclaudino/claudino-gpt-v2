@@ -5,7 +5,12 @@ from claudino_gpt.models.tokenizer import ClaudinoGPTTokenizer
 
 
 class ClaudinoGPT(TFGPT2LMHeadModel):
-    def __init__(self, tokenizer: ClaudinoGPTTokenizer, name: str = "claudino_gpt", *args, **kwargs):
+    def __init__(
+            self,
+            tokenizer: ClaudinoGPTTokenizer,
+            name: str = "claudino_gpt",
+            *args, **kwargs
+        ):
         self._config = GPT2Config(
             vocab_size=tokenizer.vocab_size,
             bos_token_id=tokenizer.bos_token_id,
