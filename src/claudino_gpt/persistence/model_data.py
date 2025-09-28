@@ -1,3 +1,4 @@
+import json
 from typing import List, Tuple
 import polars as pl
 import tensorflow as tf
@@ -69,3 +70,49 @@ def load_training_data(
     dataset_treino = dataset_treino.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
     
     return dataset_treino
+
+
+def load_fine_tune_training_data(source_path: str, feature_column_name: str) -> tf.data.Dataset:
+    """
+    Carrega dados de um arquivo JSON Lines (.jsonl), extrai a coluna de texto
+    especificada e a retorna como um tf.data.Dataset de strings.
+
+    Args:
+        source_path: Caminho para o arquivo JSONL.
+        feature_column_name: Nome da chave (coluna) no JSON que contém o texto de treino.
+
+    Returns:
+        Um tf.data.Dataset contendo apenas as strings de texto.
+    """
+    
+    # 1. Carrega o arquivo como um dataset de linhas de texto (strings)
+    # Cada elemento do dataset é uma linha JSON bruta.
+    raw_dataset = tf.data.TextLineDataset(source_path)
+
+    # 2. Função de mapeamento para analisar o JSON e extrair a coluna
+    def extract_feature(json_line):
+        # A linha JSON (tensor de string) precisa ser decodificada para Python string
+        # antes de ser analisada pelo módulo 'json' do Python.
+        json_string = json_line.numpy().decode('utf-8')
+        
+        # Analisa a string JSON e extrai o valor da coluna de interesse
+        data = json.loads(json_string)
+        text_feature = data[feature_column_name]
+        
+        # O resultado (a string de texto) precisa ser re-codificado para Tensor de String
+        return tf.constant(text_feature, dtype=tf.string)
+
+    # 3. Mapeia a função de extração no dataset
+    # tf.py_function permite executar código Python puro (como json.loads) dentro do pipeline
+    # do TensorFlow, retornando o tipo de Tensor esperado (tf.string).
+    feature_dataset = raw_dataset.map(
+        lambda x: tf.py_function(
+            func=extract_feature,
+            inp=[x],
+            Tout=tf.string
+        ),
+        num_parallel_calls=tf.data.AUTOTUNE # Otimização de desempenho
+    )
+
+    # O dataset final agora contém apenas as strings de texto.
+    return feature_dataset
